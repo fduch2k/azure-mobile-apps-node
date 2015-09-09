@@ -26,7 +26,7 @@ An official npm package will be published soon.
 
 ## Documentation & Resources
 
- - [API Documentation](azure.github.io/azure-mobile-apps-node)
+ - [API Documentation](https://azure.github.io/azure-mobile-apps-node)
  - [Tutorials & How-Tos](https://azure.microsoft.com/en-us/documentation/articles/app-service-mobile-value-prop-preview/)
  - [StackOverflow #azure-mobile-services](http://stackoverflow.com/questions/new/azure-mobile-services?show=all&sort=recentlyactive&pageSize=50)
  - [MSDN Forums](https://social.msdn.microsoft.com/forums/azure/en-US/home?forum=azuremobile)
