@@ -2,7 +2,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // ----------------------------------------------------------------------------
 var helpers = require('../helpers'),
-    _ = require('underscore.string');
+    _ = require('lodash');
 
 module.exports = function (table, item) {
     var tableName = helpers.formatTableName(table.schema || 'dbo', table.name),
@@ -26,16 +26,23 @@ module.exports = function (table, item) {
     });
 
     var sql = columnNames.length > 0
-        ? _.sprintf("INSERT INTO %s (%s) VALUES (%s); ", tableName, columnNames.join(','), valueParams.join(','))
-        : _.sprintf("INSERT INTO %s DEFAULT VALUES; ", tableName)
+        ? templates["INSERT INTO %s (%s) VALUES (%s); "]({table: tableName, columns: columnNames.join(','), values: valueParams.join(',')})
+        : templates["INSERT INTO %s DEFAULT VALUES; "]({table: tableName})
 
     if(table.autoIncrement)
-        sql += _.sprintf('SELECT * FROM %s WHERE [id] = SCOPE_IDENTITY()', tableName);
+        sql += templates['SELECT * FROM %s WHERE [id] = SCOPE_IDENTITY()']({table: tableName});
     else
-        sql += _.sprintf('SELECT * FROM %s WHERE [id] = @id', tableName);
+        sql += templates['SELECT * FROM %s WHERE [id] = @id']({table: tableName});
 
     return {
         sql: sql,
         parameters: parameters
     };
 }
+
+var templates = {
+    'INSERT INTO %s (%s) VALUES (%s); ': _.template('INSERT INTO <%table%> (<%columns%>) VALUES (<%values%>); '),
+    'INSERT INTO %s DEFAULT VALUES; ': _.template('INSERT INTO <%table%> DEFAULT VALUES; '),
+    'SELECT * FROM %s WHERE [id] = SCOPE_IDENTITY()': _.template('SELECT * FROM <%table%> WHERE [id] = SCOPE_IDENTITY()'),
+    'SELECT * FROM %s WHERE [id] = @id': _.template({table: tableName})
+};

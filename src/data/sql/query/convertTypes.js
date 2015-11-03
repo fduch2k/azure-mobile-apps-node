@@ -3,7 +3,7 @@
 // ----------------------------------------------------------------------------
 
 var types = require('../../../utilities/types'),
-    _ = require('underscore'),
+    _ = require('lodash'),
     ExpressionVisitor = require('../../../query/ExpressionVisitor');
 
 module.exports = function (expr, tableMetadata) {

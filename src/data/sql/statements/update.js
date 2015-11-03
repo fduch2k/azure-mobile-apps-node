@@ -3,7 +3,7 @@
 // ----------------------------------------------------------------------------
 var helpers = require('../helpers'),
     mssql = require('mssql'),
-    _ = require('underscore.string');
+    _ = require('lodash');
 
 module.exports = function (table, item) {
     var tableName = helpers.formatTableName(table.schema || 'dbo', table.name),
@@ -28,7 +28,7 @@ module.exports = function (table, item) {
         }
     }
 
-    var sql = _.sprintf("UPDATE %s SET %s WHERE [id] = @id ", tableName, setStatements.join(','));
+    var sql = templates["UPDATE %s SET %s WHERE [id] = @id "]({table: tableName, statements: setStatements.join(',')});
     parameters.push({ name: 'id', type: helpers.getMssqlType(item.id, true), value: item.id });
 
     if (versionValue) {
@@ -36,7 +36,7 @@ module.exports = function (table, item) {
         parameters.push({ name: 'version', type: mssql.VarBinary, value: new Buffer(versionValue, 'base64') })
     }
 
-    sql += _.sprintf("; SELECT @@ROWCOUNT as recordsAffected; SELECT * FROM %s WHERE [id] = @id", tableName);
+    sql += templates["; SELECT @@ROWCOUNT as recordsAffected; SELECT * FROM %s WHERE [id] = @id"]({table: tableName});
 
     return {
         sql: sql,
@@ -44,3 +44,8 @@ module.exports = function (table, item) {
         multiple: true
     };
 };
+
+var templates = {
+    'UPDATE %s SET %s WHERE [id] = @id ': _.template('UPDATE <%table%> SET <%statements%> WHERE [id] = @id '),
+    '; SELECT @@ROWCOUNT as recordsAffected; SELECT * FROM %s WHERE [id] = @id': _.template('; SELECT @@ROWCOUNT as recordsAffected; SELECT * FROM <%table%> WHERE [id] = @id')
+}
