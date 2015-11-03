@@ -13,6 +13,7 @@ var loadConfiguration = require('./configuration'),
     logger = require('./logger'),
     assign = require('deep-assign'),
     path = require('path'),
+    _ = require('lodash')
 
     platforms = {
         express: require('./express'),
@@ -60,7 +61,7 @@ Express 4.x is currently the only supported platform.
 module.exports = function (configuration) {
     configuration = configuration || {};
     var configFile = path.resolve(configuration.basePath || defaults.basePath, configuration.configFile || defaults.configFile);
-    configuration = assign({ logging: {}, data: {}, auth: {} }, loadConfiguration.fromFile(configFile), defaults, configuration);
+    configuration = _.merge({ logging: {}, data: {}, auth: {} }, loadConfiguration.fromFile(configFile), defaults, configuration);
     loadConfiguration.fromEnvironment(configuration);
     loadConfiguration.fromSettingsJson(configuration);
 
