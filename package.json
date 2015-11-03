@@ -23,6 +23,7 @@
     "query.js": "git://github.com/Azure/queryjs.git",
     "underscore": "^1.8.3",
     "underscore.string": "^3.1.1",
+    "lodash": "~3.10.1",
     "winston": "^1.0.1"
   },
   "devDependencies": {
