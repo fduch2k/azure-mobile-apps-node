@@ -3,7 +3,7 @@
 // ----------------------------------------------------------------------------
 var helpers = require('../helpers'),
     utilities = require('../../../utilities'),
-    assign = require('deep-assign');
+    assign = require('deeply');
 
 module.exports = function (tableConfig, item) {
     var tableName = helpers.formatTableName(tableConfig.schema || 'dbo', tableConfig.name),
@@ -22,7 +22,7 @@ module.exports = function (tableConfig, item) {
     function itemColumnsSql() {
         if(!item)
             return {};
-            
+
         return Object.keys(item).reduce(function (sql, property) {
             if(item[property] !== null && item[property] !== undefined && property !== 'id' && !helpers.isSystemProperty(property))
                 sql[property.toLowerCase()] = '[' + property + '] ' + helpers.getSqlType(item[property]) + ' NULL';

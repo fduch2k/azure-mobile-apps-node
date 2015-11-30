@@ -7,7 +7,8 @@ var statements = require('./statements'),
     schema = require('./schema'),
     log = require('../../logger'),
     assert = require('../../utilities/assert').argument,
-    promises = require('../../utilities/promises');
+    promises = require('../../utilities/promises'),
+    queries = require('../../query');
 
 module.exports = function (configuration) {
     assert(configuration, 'Data configuration was not provided.');
@@ -25,7 +26,7 @@ module.exports = function (configuration) {
         if (table.dynamicSchema !== false)
             return {
                 read: function (query) {
-                    assert(query, 'A query was not provided');
+                    query = query || queries.create(table.name);
                     return dynamicSchema(configuration).read(table, statements.read(query, table)).then(handleReadResult);
                 },
                 update: function (item) {
@@ -48,14 +49,13 @@ module.exports = function (configuration) {
                     return execute(configuration, statements.truncate(table));
                 },
                 initialize: function () {
-                    // if dynamic schema is on, let the table be created / updated on insert / update
-                    return promises.resolved();
+                    return schema(configuration).initialize(table);
                 }
             };
         else
             return {
                 read: function (query) {
-                    assert(query, 'A query was not provided');
+                    query = query || queries.create(table.name);
                     return execute(configuration, statements.read(query, table)).then(handleReadResult);
                 },
                 update: function (item) {

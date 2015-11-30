@@ -1,12 +1,15 @@
 // ----------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // ----------------------------------------------------------------------------
-var statements = require('./statements'),
-    execute = require('./execute'),
-    promises = require('../../utilities/promises'),
-    log = require('../../logger');
+module.exports = function (configuration) {
+    // these require statements must appear within this function to avoid circular reference issues between dynamicSchema and schema
+    var statements = require('./statements'),
+        execute = require('./execute'),
+        dynamicSchema = require('./dynamicSchema'),
+        promises = require('../../utilities/promises'),
+        log = require('../../logger'),
+        data = require('./index');
 
-module.exports = function (config) {
     var api = {
         initialize: function (table) {
             return api.createTable(table)
@@ -17,20 +20,23 @@ module.exports = function (config) {
 
         createTable: function(table, item) {
             log.info('Creating table ' + table.name);
-            return execute(config, statements.createTable(table, item))
+            return execute(configuration, statements.createTable(table, item))
                 .then(function () {
-                    return execute(config, statements.createTrigger(table));
+                    return execute(configuration, statements.createTrigger(table));
                 })
                 .then(function () {
                     return api.createIndexes(table);
+                })
+                .then(function () {
+                    return api.seedData(table);
                 });
         },
 
         updateSchema: function(table, item) {
             log.info('Updating schema for table ' + table.name);
-            return execute(config, statements.getColumns(table))
+            return execute(configuration, statements.getColumns(table))
                 .then(function (columns) {
-                    return execute(config, statements.updateSchema(table, columns, item));
+                    return execute(configuration, statements.updateSchema(table, columns, item));
                 })
                 .then(function () {
                     return api.createIndexes(table);
@@ -43,7 +49,7 @@ module.exports = function (config) {
                     log.info('Creating indexes for table ' + table.name);
                     return promises.all(
                         table.indexes.map(function (indexConfig) {
-                            return execute(config, statements.createIndex(table, indexConfig));
+                            return execute(configuration, statements.createIndex(table, indexConfig));
                         })
                     );
                 } else {
@@ -51,6 +57,16 @@ module.exports = function (config) {
                 }
             } else {
                 return promises.resolved();
+            }
+        },
+
+        seedData: function (table) {
+            if(table.seed)
+                return promises.all(table.seed.map(insert));
+            return promises.resolved();
+
+            function insert(item) {
+                return dynamicSchema(configuration).execute(table, statements.insert(table, item), item);
             }
         }
     };

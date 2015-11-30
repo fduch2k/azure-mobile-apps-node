@@ -17,7 +17,9 @@ module.exports = function (authConfiguration, token, provider) {
 
         request.on('error', function (error) {
             log.error('Could not retrieve identity from gateway', error);
+            console.error(error);
             reject(error);
         });
+        request.end();
     });
 };
