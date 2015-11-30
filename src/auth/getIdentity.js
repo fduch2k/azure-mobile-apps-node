@@ -6,6 +6,7 @@ var https = require('https'),
     log = require('../logger');
 
 module.exports = function (authConfiguration, token, provider) {
+    console.log(authConfiguration.gatewayUrl);
     return promises.create(function (resolve, reject) {
         var request = https.request({
             hostname: authConfiguration.gatewayUrl,
