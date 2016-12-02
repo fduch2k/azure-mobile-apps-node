@@ -5,7 +5,7 @@
 @module azure-mobile-apps/query
 @description Functionality for creating {@link https://github.com/Azure/queryjs query.js} objects
 */
-var Query = require('query.js').Query,
+var Query = require('azure-query-js').Query,
     assert = require('../utilities/assert').argument;
 
 module.exports = {
