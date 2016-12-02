@@ -1,7 +1,7 @@
 // ----------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // ----------------------------------------------------------------------------
-var Query = require('query.js').Query;
+var Query = require('azure-query-js').Query;
 
 module.exports = function(name, table) {
     var query;
