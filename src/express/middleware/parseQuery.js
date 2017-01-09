@@ -13,6 +13,7 @@ module.exports = function (table) {
         if(req.params.id) {
             context.id = req.params.id;
             context.query = queries.create(table.name).where({ id: context.id });
+            context.query.id = context.id;
             context.query.single = true;
         } else {
             enforceMaxTop();
